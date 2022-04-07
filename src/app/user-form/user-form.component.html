@@ -1,0 +1,110 @@
+<ion-card [formGroup]="formGroup">
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-item
+          ><ion-label position="stacked">Meno a Priezvisko</ion-label>
+          <ion-input
+            clearInput
+            required
+            [formControl]="controls.fullName"
+          ></ion-input>
+          <ion-text
+            color="danger"
+            *ngIf="
+              controls.fullName.touched && controls.fullName.valid === false
+            "
+          >
+            {{ extractError(controls.fullName) }}
+          </ion-text></ion-item
+        >
+      </ion-col>
+      <ion-col>
+        <ion-item
+          ><ion-label position="stacked">Email</ion-label>
+          <ion-input
+            [formControl]="controls.email"
+            clearInput
+            required
+            type="email"
+            inputmode="email"
+            multiple="false"
+          ></ion-input
+          ><ion-text
+            color="danger"
+            *ngIf="controls.email.touched && controls.email.valid === false"
+          >
+            {{ extractError(controls.email) }}
+          </ion-text></ion-item
+        >
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-item class="date-field" (click)="popover.present()">
+          <ion-label position="stacked">Dátum narodenia</ion-label>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-input readonly [formControl]="controls.date"></ion-input>
+              </ion-col>
+              <ion-col class="align-right"
+                ><ion-button fill="clear" id="open-date-input-2">
+                  <ion-icon icon="calendar"></ion-icon> </ion-button
+              ></ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <ion-popover
+            #popover
+            trigger="open-date-input-2"
+            show-backdrop="false"
+          >
+            <ng-template>
+              <ion-datetime
+                #popoverDatetime
+                locale="sk-SK"
+                presentation="date"
+                (ionChange)="updateDateField(popoverDatetime.value)"
+                min="1850"
+                [max]="getYearNow()"
+                [showClearButton]="true"
+              ></ion-datetime>
+            </ng-template>
+          </ion-popover>
+          <ion-text
+            color="danger"
+            *ngIf="controls.date.touched && controls.date.valid === false"
+          >
+            {{ extractError(controls.fullName) }}
+          </ion-text>
+        </ion-item>
+      </ion-col>
+      <ion-col>
+        <ion-item
+          ><ion-label position="stacked">Krajina</ion-label>
+          <ion-select [formControl]="controls.country">
+            <ion-select-option
+              *ngFor="let country of countries"
+              [value]="country"
+              >{{ country }}</ion-select-option
+            ></ion-select
+          >
+          <ion-text
+            color="danger"
+            *ngIf="controls.country.touched && controls.country.valid === false"
+          >
+            {{ extractError(controls.country) }}
+          </ion-text>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button type="submit" (click)="submitForm()" [disabled]="formGroup.invalid"
+          >Submit</ion-button
+        >
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-card>

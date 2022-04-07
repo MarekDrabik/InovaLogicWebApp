@@ -1,0 +1,9 @@
+.date-field {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+
+  .align-right {
+    text-align: right;
+  }
+}
