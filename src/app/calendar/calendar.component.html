@@ -1,0 +1,14 @@
+<ion-popover #popover trigger="open-date-input-2" show-backdrop="false">
+  <ng-template>
+    <ion-datetime
+      #popoverDatetime
+      [value]="currentDateValue"
+      locale="sk-SK"
+      presentation="date"
+      min="1850"
+      (ionChange)="onUserDateInput(popoverDatetime.value, popover)"
+      [max]="getYearNow()"
+    >
+    </ion-datetime>
+  </ng-template>
+</ion-popover>

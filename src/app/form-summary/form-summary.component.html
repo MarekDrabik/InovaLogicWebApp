@@ -1,0 +1,12 @@
+<ion-card class="container">
+  <ion-list>
+    <ion-text>Meno a priezvisko: <ion-text class="user-input">{{summaryValues?.fullName}}</ion-text></ion-text><br />
+    <ion-text>Email: <ion-text class="user-input">{{summaryValues?.email}}</ion-text></ion-text><br />
+    <ion-text>Datum narodenia: <ion-text class="user-input">{{summaryValues?.date}}</ion-text></ion-text><br />
+    <ion-text>Krajina: <ion-text class="user-input">{{summaryValues?.country}}</ion-text></ion-text><br />
+    <ion-text>Mena: <ion-text class="user-input">{{summaryValues?.currency}}</ion-text></ion-text><br />
+    <ion-text color="danger" *ngIf="currencyFetchError"
+      >Menu krajiny sa nepodarilo zo servera načítať.</ion-text
+    >
+  </ion-list>
+</ion-card>

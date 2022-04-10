@@ -1,20 +1,16 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="returnToTab1()"
+        ><ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon
+      ></ion-button>
+    </ion-buttons>
     <ion-title> Sumarizácia </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Sumarizácia</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-list>
-    <ion-text>Meno a priezvisko: {{values.fullName}}</ion-text><br>
-    <ion-text>Email: {{values.email}}</ion-text><br>
-    <ion-text>Datum narodenia: {{values.date}}</ion-text><br>
-    <ion-text>Krajina: {{values.country}}</ion-text><br>
-    <ion-text>Mena: N/A</ion-text>
-  </ion-list>
+  <app-form-summary></app-form-summary>
 </ion-content>
+
+

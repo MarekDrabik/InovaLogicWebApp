@@ -1,8 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { FormSubmitionService } from '../form-submition.service';
-import { InputValidationService } from '../input-validation.service';
+import { CalendarComponent } from '../calendar/calendar.component';
+import { CountriesApiService } from '../services/countries-api.service';
+import { ErrorsService } from '../services/errors.service';
+import { FormSubmitionService } from '../services/form-submition.service';
+import { InputValidationService } from '../services/input-validation.service';
+import { UnsubscriptionService } from '../services/unsubscription.service';
+import { UserFormControls } from '../others/types';
 
 @Component({
   selector: 'app-user-form',
@@ -10,80 +16,96 @@ import { InputValidationService } from '../input-validation.service';
   styleUrls: ['./user-form.component.scss'],
 })
 export class UserFormComponent implements OnInit {
-  countries = ['Uganda', 'Czechia', 'Albania'];
+  countries: string[];
+  showCountriesNotFetchedError = false;
+  submitEnabled = false;
+  controlsNames: (keyof UserFormControls)[] = [
+    'fullName',
+    'email',
+    'date',
+    'country',
+  ];
+  controls: UserFormControls = null;
+  formGroup: FormGroup = null;
+
   private _subs: Subscription[] = [];
 
-  constructor(
-    private inputValidationServ: InputValidationService,
-    private formSubmitionServ: FormSubmitionService
-  ) {}
+  @ViewChild('calendar', { read: CalendarComponent })
+  calendarComponent: CalendarComponent;
 
-  controls: {
-    [s: string]: FormControl;
-  } = {
-    fullName: new FormControl(
-      '',
-      Validators.compose([
-        Validators.required,
-        this.inputValidationServ.fullNameValidator,
-      ])
-    ),
-    email: new FormControl(
-      '',
-      Validators.compose([Validators.required, Validators.email])
-    ),
-    date: new FormControl('', Validators.required),
-    country: new FormControl('', Validators.required),
-  };
-  formGroup: FormGroup = new FormGroup(this.controls);
+  constructor(
+    public inputValidationServ: InputValidationService,
+    private formSubmitionServ: FormSubmitionService,
+    private router: Router,
+    private countriesApiServ: CountriesApiService,
+    public errorsServ: ErrorsService,
+    private unsubServ: UnsubscriptionService
+  ) {
+    this.controls = this._buildControls();
+    this.formGroup = new FormGroup(this.controls);
+  }
 
   ngOnInit() {
+    this._loadCountries();
+    this._observeUserInputToSyncValidateForm();
+  }
+
+  onUserDateInput(slovakDate: string) {
+    this.controls.date.setValue(slovakDate, { emitEvent: true });
+    this.controls.date.updateValueAndValidity();
+    /*this is important call, because validator needs run after user input
+    because validator is using checkControlAccessed function which needs current user input*/
+  }
+
+  onSubmit() {
+    this.formSubmitionServ.submitForm(this.formGroup);
+    this.router.navigate(['/tabs/tab2']);
+  }
+
+  onResetClick() {
+    for (let control in this.controls) {
+      this.controls[control].reset('', { onlyself: false });
+    }
+    this.inputValidationServ.resetControlsAccessed(); //must go behind this.controls[control].reset('') call
+    this.calendarComponent.resetValue();
+    this.submitEnabled = false;
+  }
+
+  private _buildControls() {
+    const controls = {} as unknown as UserFormControls;
+    this.controlsNames.forEach(
+      (name) =>
+        (controls[name] = new FormControl(
+          '',
+          ...this.inputValidationServ.getControlValidators(name)
+        ))
+    );
+    return controls;
+  }
+
+  private _observeUserInputToSyncValidateForm() {
     this._subs.push(
       this.formGroup.valueChanges.subscribe({
-        next: (ev) => {
-          console.log(ev, this.formGroup);
+        next: (values) => {
+          this.inputValidationServ.updateControlsAccessed(values);
+          this.submitEnabled =
+            this.inputValidationServ.checkFormValiditySynchronously(
+              this.formGroup
+            );
         },
       })
     );
   }
 
-  getYearNow() {
-    new Date(Date.now()).getFullYear();
-  }
-
-  extractError(control: FormControl) {
-    if (!control) return;
-    if (
-      control.errors.hasOwnProperty('required') &&
-      control.errors.required === true
-    ) {
-      return 'Pole musí byť vyplnené.';
+  private async _loadCountries() {
+    try {
+      this.countries = await this.countriesApiServ.getCountries();
+    } catch {
+      this.showCountriesNotFetchedError = true;
     }
-    if (
-      control.errors.hasOwnProperty('email') &&
-      control.errors.email === true
-    ) {
-      return 'Nesprávny tvar emailu.';
-    }
-    if (control.errors.hasOwnProperty('fullNameError')) {
-      return control.errors.fullNameError;
-    }
-  }
-
-  updateDateField(value: string) {
-    console.log('value', value);
-    const slovakDate =
-      value == null
-        ? null
-        : new Date(value).toLocaleString('sk-SK').split(',')[0];
-    this.controls.date.setValue(slovakDate, { emitEvent: true });
-  }
-
-  submitForm() {
-    this.formSubmitionServ.submitForm(this.formGroup);
   }
 
   ngOnDestroy() {
-    this._subs.forEach((s) => s.unsubscribe());
+    this.unsubServ.unsubscribeFromArray(this._subs);
   }
 }

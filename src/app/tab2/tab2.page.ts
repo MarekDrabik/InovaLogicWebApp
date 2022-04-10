@@ -1,37 +1,17 @@
-import { Component } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { FormSubmitionService } from '../form-submition.service';
-
-export type SubmitValues = {
-  fullName: string,
-  email: string,
-  date: string,
-  country: string,
-}
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss']
+  styleUrls: ['tab2.page.scss'],
 })
-export class Tab2Page {
+export class Tab2Page implements OnInit {
+  constructor(private router: Router) {}
 
-  private _sub : Subscription;
-  values: SubmitValues = {
-    fullName: '',
-    email: '',
-    date: '',
-    country: '',
+  ngOnInit() {}
+
+  returnToTab1() {
+    this.router.navigate(['/tabs/tab1']);
   }
-
-  constructor(private formSubmitionServ: FormSubmitionService) {
-    this._sub = this.formSubmitionServ.formSubmit$.subscribe({
-      next: values => this.values = values
-    })
-  }
-
-  ngOnDestroy() {
-    this._sub.unsubscribe();
-  }
-
 }

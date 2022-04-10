@@ -1,0 +1,9 @@
+<div *ngIf="displayError===true" class="container" [@creation]="'in'">
+  <ion-icon color="danger" name="arrow-up-outline"></ion-icon>
+  <ion-text
+    class="input-error"
+    color="danger"
+  >
+    {{ errorText }}
+  </ion-text>
+</div>

@@ -1,9 +1,35 @@
-.date-field {
-  display: flex;
-  flex-direction: row;
-  cursor: pointer;
+.date-field::ng-deep {
+  input {
+    cursor: pointer;
+  }
+}
 
-  .align-right {
-    text-align: right;
+.formContainer {
+  max-width: 30rem;
+  margin: 3rem auto;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.info-container {
+  width: fit-content;
+  margin: auto;
+  height: 1rem;
+  ion-text {
+    font-size: 0.8rem;
+  }
+}
+
+.connection-error-container {
+  margin: auto;
+  width: 90%;
+  text-align: center;
+  ion-text {
+    font-size: 0.8rem;
   }
 }

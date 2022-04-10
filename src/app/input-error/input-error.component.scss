@@ -1,0 +1,15 @@
+
+.container {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  margin: 0 2rem;
+}
+
+.input-error {
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+
